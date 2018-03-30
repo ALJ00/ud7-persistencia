@@ -40,7 +40,12 @@ public class VentanaPrincipal {
                 if(texto.equalsIgnoreCase("")){
                     JOptionPane.showMessageDialog(panelTareas,"Tarea no válida");
                 }else{
-                    rellenarLista(texto);
+                    try {
+                        escribirJson(texto);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+
                     textFieldTexto.setText("");
                 }
             }
@@ -56,13 +61,6 @@ public class VentanaPrincipal {
 
             Gson gson = new Gson();
 
-            Tarea[]arrayTareas = gson.fromJson(json,Tarea[].class);
-
-            tareas.clear();
-
-            for (Tarea t : arrayTareas) {
-                tareas.add(t);
-            }
 
         }catch(IOException e){
             e.printStackTrace();
@@ -77,14 +75,21 @@ public class VentanaPrincipal {
 
     }
 
-    private void escribirJson() throws IOException {
+    private void escribirJson(String texto) throws IOException {
         FileOutputStream fos=null;
         try{
             fos = new FileOutputStream("tareas.json");
             Writer w = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
 
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String json = gson.toJson(tareas);
+            String json = gson.toJson(texto);
+
+          
+
+
+            w.write(json);
+
+
 
             w.flush();
             w.close();
