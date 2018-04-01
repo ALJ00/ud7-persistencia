@@ -21,82 +21,67 @@ public class VentanaPrincipal {
     private JTextField textFieldTexto;
     private JButton buttonAnadir;
     private JPanel panelTareas;
-    private JScrollBar scrollBar1;
+    private JLabel mensaje;
+    private JScrollPane scrollLista;
 
     private List<Tarea> tareas = new ArrayList<>();
-    private DefaultListModel<String> model  = new DefaultListModel<>();
-
+    
     public VentanaPrincipal() throws IOException {
-
-        leerJson();
-
 
         buttonAnadir.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 String texto = textFieldTexto.getText();
-
-                if(texto.equalsIgnoreCase("")){
-                    JOptionPane.showMessageDialog(panelTareas,"Tarea no válida");
+                if(texto.equals("")){
+                    JOptionPane.showMessageDialog(panelTareas,"tarea no válida");
                 }else{
-                    try {
-                        escribirJson(texto);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+
+                    Tarea nuevaTarea = new Tarea(texto);
+
+                    tareas.add(nuevaTarea);
+
+                    actualizarLista();
 
                     textFieldTexto.setText("");
+
+                }
+            }
+        });
+        buttonCompletar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if((listTexto.getMinSelectionIndex())<0){
+                    JOptionPane.showMessageDialog(panelTareas,"Seleccione una tarea");
+                }else{
+                    int[] seleccionadas = listTexto.getSelectedIndices();
+
+                    List<Tarea> sinCompletar = new ArrayList<>();
+
+                    for (Tarea t : tareas) {
+                        if (!t.isCompletada()) {
+                            sinCompletar.add(t);
+                        }
+                    }
+
+                    for (int posicion : seleccionadas) {
+                        sinCompletar.get(posicion).setCompletada(true);
+                    }
+
+                    actualizarLista();
                 }
             }
         });
     }
 
-    private void leerJson() {
-        try{
-            BufferedReader br = new BufferedReader(new InputStreamReader
-                    (new FileInputStream("tareas.json"), StandardCharsets.UTF_8));
+    private void actualizarLista() {
+        DefaultListModel<Tarea> modelo = new DefaultListModel<>();
 
-            String json = br.lines().collect(Collectors.joining());
-
-            Gson gson = new Gson();
-
-
-        }catch(IOException e){
-            e.printStackTrace();
-         }
-    }
-
-    private void rellenarLista(String texto) {
-        Tarea tarea = new Tarea(texto);
-        tareas.add(tarea);
-        model.addElement(texto);
-        listTexto.setModel(model);
-
-    }
-
-    private void escribirJson(String texto) throws IOException {
-        FileOutputStream fos=null;
-        try{
-            fos = new FileOutputStream("tareas.json");
-            Writer w = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
-
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String json = gson.toJson(texto);
-
-          
-
-
-            w.write(json);
-
-
-
-            w.flush();
-            w.close();
-
-        }catch  (FileNotFoundException e) {
-            e.printStackTrace();
+        for (Tarea t : tareas) {
+            if (!t.isCompletada())
+                modelo.addElement(t);
         }
+
+        listTexto.setModel(modelo);
     }
 
 

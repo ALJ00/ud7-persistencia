@@ -1,1 +1,10 @@
-"gato"
+
+  {
+    "nombre": "hola",
+    "completada": false
+  },
+  {
+    "nombre": "perro",
+    "completada": false
+  }
+]

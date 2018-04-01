@@ -47,9 +47,6 @@ public class Tarea {
 
     @Override
     public String toString() {
-        return "Tarea{" +
-                "nombre='" + nombre + '\'' +
-                ", completada=" + completada +
-                '}';
+        return nombre;
     }
 }
